@@ -1,0 +1,76 @@
+---
+title: "Assignment - 2"
+author: "13"
+format: html
+editor: visual
+echo: false
+---
+
+Task 1
+
+```{r}
+rm(list=ls())
+library(tidyverse)
+library(rvest)
+library(janitor)
+library(gdata)
+library(stringr)
+```
+
+```{r}
+url <- "https://www.motor.no/aktuelt/motors-store-vintertest-av-rekkevidde-pa-elbiler/217132"
+
+Motor_biler <- url %>% 
+  read_html() %>% 
+  html_element("table") %>% 
+  html_table() %>% 
+  row_to_names(row_number = 1)
+```
+
+```{r}
+colnames(Motor_biler)[1] = "modell"
+colnames(Motor_biler)[2] = "wltp"
+colnames(Motor_biler)[3] = "stopp"
+```
+
+```{r}
+Motor_biler$wltp <- substr(Motor_biler$wltp, 0,3) %>% 
+  as.numeric()
+Motor_biler$stopp <- substr(Motor_biler$stopp,0,3) %>% 
+  as.numeric()
+```
+
+```{r}
+Motor_biler %>% 
+  ggplot(aes(x=wltp, y=stopp))+
+  geom_point()+
+  geom_abline(intercept = 0,slope = 1)+
+  scale_x_continuous(limits = c(200, 600))+
+  scale_y_continuous(limits = c(200, 600))+
+  xlab("hevdet rekkevidde")+
+  ylab("virkelig rekkevidde")+
+  ggtitle("Elektriske biler hevdet rekkevidde kontra virkelig rekkevidde")
+```
+
+Task 2
+
+```{r}
+lm(stopp ~ wltp, data = Motor_biler)
+```
+
+```{r}
+Motor_biler %>% 
+  ggplot(aes(x=wltp, y=stopp))+
+  geom_point()+
+   geom_abline(intercept = 0,slope = 1)+
+  scale_x_continuous(limits = c(200, 600))+
+  scale_y_continuous(limits = c(200, 600))+
+  xlab("hevdet rekkevidde")+
+  ylab("virkelig rekkevidde")+
+  ggtitle("Elektriske biler hevdet rekkevidde kontra virkelig rekkevidde")+
+  geom_smooth(method = lm)
+```
+
+```{r}
+
+```
